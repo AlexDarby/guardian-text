@@ -4,10 +4,10 @@ account_id = "${env:CF_ACCOUNT_ID}"
 workers_dev = false
 
 [build]
-command = "npm install && npm run build"
-output = "dist"
+command = "npm install"
+main = "index.js"
 
 [site]
-bucket = "./dist"
+bucket = "."
 entry-point = "worker"
 
