@@ -1,33 +1,31 @@
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
+const apiEndpoint = 'https://nameless-paper-65d7.alexjdarby.workers.dev/';
 
-async function handleRequest(request) {
-  const apiKey = API_KEY; // Retrieve API key from environment variable
-  const apiEndpoint = `https://content.guardianapis.com/search?api-key=${apiKey}`;
+async function fetchArticles() {
   const response = await fetch(apiEndpoint);
   const data = await response.json();
+  return data.response.results;
+}
 
-  const articles = data.response.results.map(result => {
-    return `<h2><a href="${result.webUrl}">${result.webTitle}</a></h2>
-            <p>Published: ${result.webPublicationDate}</p>
-            <p>Section: ${result.sectionName}</p>
-            <p>${result.fields.bodyText}</p>`;
+function renderArticles(articles) {
+  const articleElements = articles.map(article => {
+    return `<h2><a href="${article.webUrl}">${article.webTitle}</a></h2>
+            <p>Published: ${article.webPublicationDate}</p>
+            <p>Section: ${article.sectionName}</p>
+            <p>${article.fields.bodyText}</p>`;
   });
-
   const html = `<!DOCTYPE html>
               <html>
               <head>
               <title>The Guardian Articles</title>
               </head>
               <body>
-              ${articles.join('')}
+              ${articleElements.join('')}
               </body>
               </html>`;
-
-  return new Response(html, {
-    headers: {
-      'content-type': 'text/html;charset=UTF-8',
-    },
-  });
+  document.body.innerHTML = html;
 }
+
+(async function() {
+  const articles = await fetchArticles();
+  renderArticles(articles);
+})();
