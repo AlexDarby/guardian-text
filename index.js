@@ -7,23 +7,35 @@ async function fetchArticles() {
 }
 
 function renderArticles(articles) {
-  const articleElements = articles.map(article => {
-    return `<h2><a href="${article.webUrl}">${article.webTitle}</a></h2>
-            <p>Published: ${article.webPublicationDate}</p>
-            <p>Section: ${article.sectionName}</p>
-            <p>${article.fields.bodyText}</p>`;
-  });
-  const html = `<!DOCTYPE html>
-              <html>
-              <head>
-              <title>The Guardian Articles</title>
-              </head>
-              <body>
-              ${articleElements.join('')}
-              </body>
-              </html>`;
-  document.body.innerHTML = html;
-}
+    const articlesElement = document.getElementById('articles');
+    articlesElement.innerHTML = '';
+  
+    articles.forEach(article => {
+      const articleElement = articleTemplate.content.cloneNode(true);
+  
+      articleElement.querySelector('.headline').textContent = article.webTitle;
+  
+      const section = article.sectionName ? article.sectionName : 'News';
+      articleElement.querySelector('.section').textContent = section;
+  
+      const date = new Date(article.webPublicationDate);
+      const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+      articleElement.querySelector('.date').textContent = date.toLocaleDateString('en-US', dateOptions);
+  
+      if (article.fields && article.fields.thumbnail) {
+        articleElement.querySelector('.thumbnail').src = article.fields.thumbnail;
+      }
+  
+      if (article.fields && article.fields.trailText) {
+        articleElement.querySelector('.trail').textContent = article.fields.trailText;
+      }
+  
+      articleElement.querySelector('.read-more').href = article.webUrl;
+  
+      articlesElement.appendChild(articleElement);
+    });
+  }
+  
 
 (async function() {
   const articles = await fetchArticles();
