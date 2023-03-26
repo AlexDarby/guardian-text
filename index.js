@@ -7,7 +7,7 @@ async function fetchArticles() {
 }
 
 async function renderArticles() {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiEndpoint);
     const data = await response.json();
     const articles = data.response.results;
     
