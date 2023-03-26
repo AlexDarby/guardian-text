@@ -6,34 +6,20 @@ async function fetchArticles() {
   return data.response.results;
 }
 
-function renderArticles(articles) {
-    const articlesElement = document.getElementById('articles');
-    articlesElement.innerHTML = '';
+async function renderArticles() {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const articles = data.response.results;
+    
+    const articlesHtml = articles.map(article => {
+      const { webTitle, webUrl, sectionName } = article;
+      const imageSrc = article.fields?.thumbnail ?? 'https://via.placeholder.com/150';
   
-    articles.forEach(article => {
-      const articleElement = articleTemplate.content.cloneNode(true);
+      return articleElements(webTitle, webUrl, sectionName, imageSrc);
+    }).join('');
   
-      articleElement.querySelector('.headline').textContent = article.webTitle;
-  
-      const section = article.sectionName ? article.sectionName : 'News';
-      articleElement.querySelector('.section').textContent = section;
-  
-      const date = new Date(article.webPublicationDate);
-      const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-      articleElement.querySelector('.date').textContent = date.toLocaleDateString('en-US', dateOptions);
-  
-      if (article.fields && article.fields.thumbnail) {
-        articleElement.querySelector('.thumbnail').src = article.fields.thumbnail;
-      }
-  
-      if (article.fields && article.fields.trailText) {
-        articleElement.querySelector('.trail').textContent = article.fields.trailText;
-      }
-  
-      articleElement.querySelector('.read-more').href = article.webUrl;
-  
-      articlesElement.appendChild(articleElement);
-    });
+    const container = document.querySelector('#articles-container');
+    container.innerHTML = articlesHtml;
   }
   
 
